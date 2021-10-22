@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie API Throttle</title>
+    <style>
+        body{
+            background: #000;
+            color: white;
+        }
+        body > div{
+            width: 700px;
+            margin: 50px auto;
+            display: flex;
+        }
+        input{
+            border-radius: 15px;
+            border: 2px dashed green;
+            height: 30px;
+            width: 500px;
+        }
+        button{
+            height: 30px;
+            margin-left: 30px;
+            width: 150px;
+            border: none;
+            border-radius: 10px;
+            background: green;
+        }
+        a{
+            font-size: 20px;
+            color: #000;
+            text-decoration: none;
+        }
+        a:hover{
+            color: grey;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <div id="search-bar"><input type="text" id="input" placeholder="Search Movie">
+        <div id="container"></div></div>
+        <button>Search</button>
+    </div>
+    <script>
+        window.addEventListener('load', ()=>{
+            const input = document.getElementById('input');
+            input.addEventListener('keyup', throttler)
+        })
+
+        function loadThrottle() {
+            var value = document.getElementById('input').value;
+            fetch(`http://www.omdbapi.com/?apikey=5be517b5&s=${value}`)
+            .then(resolve => resolve.json())
+            .then(resolve => showMovieList(resolve.Search, value))
+            .catch(err => console.log(err));
+        }
+        function throttler() {
+            let last = Date.now()
+            return function(){
+                const now = Date.now();
+                console.log(last, now);
+                if((now - last) > 1000){
+                    loadThrottle()
+                    last = now;
+                }
+            }
+        }
+        function showMovieList(data, value){
+            console.log(data);
+            const input = document.getElementById('search-bar')
+            let div = document.getElementById('container');
+            div.innerHTML = null;
+            for(let movie in data){
+                if(data!== undefined){
+                    const a = document.createElement('a');
+                    a.textContent = `${data[movie].Title}`
+                    a.href = '#'
+                    const br = document.createElement('br')
+                    // console.log(data)
+                    div.append(a, br);
+                    div.style.border = '1px Solid green'
+                    div.style.background = 'white'
+                    div.style.color = 'black'
+                }    
+                else{
+                    let div = document.getElementById('container');
+                    div.style.border = '1px solid black';
+                }
+            }
+            input.append(div);
+        }
+    </script>
+</body>
+</html>
